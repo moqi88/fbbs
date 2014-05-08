@@ -232,9 +232,9 @@
     only screen and (min-resolution: 2dppx) {
     .ui-top-bar .notification.mail .notification-icon {
         background-repeat: no-repeat;
-        -moz-background-size: 50% 50%;
-          -o-background-size: 50% 50%;
-             background-size: 50% 50%;
+        -moz-background-size: 20px 20px;
+          -o-background-size: 20px 20px;
+             background-size: 20px 20px;
         background-image: url(decorator/mail@2x.png); /** sprite-ref: common@2x; */
     }
 }
