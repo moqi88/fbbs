@@ -6,7 +6,8 @@
         options: {
             registUrl: 'javascript:void(0);',
             forgetUrl: 'javascript:void(0);',
-            loginText: '登&emsp;&emsp;陆',
+            loginText: '登&#12288;&#12288;陆',
+            loginUrl: '',
             dialogTitle: '登陆',
             loadingText: '登陆中...',
             trigger: '',
@@ -59,10 +60,22 @@
         _onclickSubmit: function (event) {
             event.preventDefault();
             if (this.validation()) {
-                this._trigger('onsubmit', null, {
+                var data = {
                     id: this._$id.val(),
                     pw: this._$pw.val(),
                     rm: this._$rm.prop('checked')
+                };
+                this._trigger('onsubmit', null, data);
+                this.loading();
+                var me = this;
+                $.jsonAjax('POST', this.options.loginUrl, data, function (orginData) {
+                    me.reset();
+                    me.close();
+                    me.save($.extend({}, orginData, {rm: data.rm}));
+                    me._trigger('onloginSuccess', null, orginData);
+                }, function (msg) {
+                    this.reset();
+                    this.error(msg);
                 });
             }
         },
@@ -152,7 +165,6 @@
                 .prop('disabled', true)
                 .addClass('disabled');
             this.element.addClass('loading');
-            console.log(this.element);
         },
         reset: function () {
             this._$submit

@@ -25,11 +25,6 @@
 
     text-align: center;
 }
-.hide-for-desktop {
-    display: none;
-
-    *display: none!important;
-}
 .wrapper {
     max-width: 980px;
     margin: 0 auto;
@@ -52,6 +47,7 @@
     top: 55px;
     right: 0;
     left: 0;
+
     overflow: auto;
 
     width: 100%;
@@ -75,34 +71,10 @@
     z-index: 899;
 
     margin-top: 20px;
+
+    background: #FFF;
 }
 
-@media only screen and (min-width: 768px) {
-    .hide-for-desktop {
-        display: none!important;
-    }
-}
-
-@media only screen and (max-width: 767px) {
-    .global-tip {
-        margin-top: 45px;
-        margin-bottom: 5px;
-    }
-    .side-nav {
-        display: none;
-    }
-    .main {
-        min-height: 400px;
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-    .hide-for-mobile {
-        display: none!important;
-    }
-    .hide-for-desktop {
-        display: block;
-    }
-}
 @-webkit-keyframes tada {
     0% {
         -webkit-transform: scale(1);
@@ -196,67 +168,4 @@
        -moz-animation-name: tada;
          -o-animation-name: tada;
             animation-name: tada;
-}
-
-@-webkit-keyframes pulse {
-    0% {
-        -webkit-transform: scale(1);
-    }
-    50% {
-        -webkit-transform: scale(1.1);
-    }
-    100% {
-        -webkit-transform: scale(1);
-    }
-}
-@-moz-keyframes pulse {
-    0% {
-        -moz-transform: scale(1);
-    }
-    50% {
-        -moz-transform: scale(1.1);
-    }
-    100% {
-        -moz-transform: scale(1);
-    }
-}
-@-o-keyframes pulse {
-    0% {
-        -o-transform: scale(1);
-    }
-    50% {
-        -o-transform: scale(1.1);
-    }
-    100% {
-        -o-transform: scale(1);
-    }
-}
-@keyframes pulse {
-    0% {
-        -webkit-transform: scale(1);
-           -moz-transform: scale(1);
-            -ms-transform: scale(1);
-             -o-transform: scale(1);
-                transform: scale(1);
-    }
-    50% {
-        -webkit-transform: scale(1.1);
-           -moz-transform: scale(1.1);
-            -ms-transform: scale(1.1);
-             -o-transform: scale(1.1);
-                transform: scale(1.1);
-    }
-    100% {
-        -webkit-transform: scale(1);
-           -moz-transform: scale(1);
-            -ms-transform: scale(1);
-             -o-transform: scale(1);
-                transform: scale(1);
-    }
-}
-.pulse {
-    -webkit-animation-name: pulse;
-       -moz-animation-name: pulse;
-         -o-animation-name: pulse;
-            animation-name: pulse;
 }

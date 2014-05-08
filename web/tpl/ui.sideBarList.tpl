@@ -11,7 +11,7 @@
                 }
             }
         </li>
-        if (this.loadingTip) {
+        if (this.loading === true) {
             <li class="ui-side-bar-list-loading-tip">
                 <a href="javascript:void(0);" class="ui-side-bar-list-target">#{this.loadingTip}</a>
             </li>

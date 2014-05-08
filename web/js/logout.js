@@ -2,7 +2,7 @@
     'use strict';
 
     var page = {
-        components: ['Login'],
+        components: [],
         config: {
             logoutErrorTip: '退出失败，请刷新重试。(#{0})',
             logoutSuccessTip: '您已成功退出。',
@@ -31,6 +31,8 @@
             this.Login.login('rebind');
             $('.logout-loading').hide();
             $('.logout-tip').text(this.config.logoutSuccessTip);
+            this.Collections.empty();
+            this.Collections.hide();
             window.location.href = this.systemConfig.defaultPage;
         },
         onlogoutFailed: function (msg) {

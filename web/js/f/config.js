@@ -17,7 +17,6 @@ f.config = {
         ajaxUri: "/web/bbs",
         cookiePath: "/",
         defaultTitle: "日月光华 | 复旦大学BBS",
-        defaultShortTitle: "日月光华",
         copyright: ['&copy;&nbsp;1996-', (new Date()).getFullYear(), '&nbsp;日月光华'].join(""),
         icp: {
             label: "沪ICP备042465号",
@@ -27,7 +26,6 @@ f.config = {
         notificationInterval: 60000
     },
     urlConfig: {
-        login: "#/login.html",
         logout: "#/logout.html",
         newMail: "#/new_mail.html",
         mail: "#/mail.html",

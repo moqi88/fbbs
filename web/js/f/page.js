@@ -118,7 +118,7 @@
          */
         oninitComponents: function (components) {
             if (f.isArray(components)) {
-                components.push('BoardSearch', 'Collections');
+                components.push('Tip', 'Notifications', 'BoardSearch', 'Collections', 'Login');
             }
         },
         /**
@@ -195,7 +195,6 @@
                 }
 
                 if (f.isFunction(this[initType])) {
-
                     this[initType](params);
                 }
             }

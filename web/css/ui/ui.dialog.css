@@ -54,23 +54,3 @@
     background-image: url(decorator/close_dialog.png); /** sprite-ref: common; */
     background-color: transparent;
 }
-
-@media only screen and (max-width: 767px) {
-    .ui-dialog-titlebar-close {
-        font-size: 12px;
-
-        position: absolute;
-        top: 3px;
-        right: 0;
-
-        display: block;
-
-        width: auto;
-        height: 20px;
-
-        text-indent: 0;
-
-        color: #999;
-        background-image: none;
-    }
-}

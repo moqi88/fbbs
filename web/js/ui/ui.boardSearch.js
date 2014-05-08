@@ -12,9 +12,11 @@
             tpl: 'ui.boardSearch.tpl',
             listTpl: 'ui.sideBarList.tpl',
             searchDelay: 700,
+            searchUrl: '',
             keydownKeyCode: [
                 8, 46, // backspace, delete
                 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, // 0-9
+                96, 97, 98, 99, 100, 101, 102, 103, 104, 105, // Number pad 0-9
                 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
                 81, 82, 83, 84, 85, 86, 87, 88, 89, 90  // a-z
             ],
@@ -36,6 +38,7 @@
             this._$input = this.element.find('.ui-board-search-input');
             this._$container = this.element.find('.ui-board-search');
             this._$list = this.element.find('.ui-board-search-list-container');
+            this._$reset = this.element.find('.ui-side-bar-list-reset')
         },
         _checkPlaceholder: function (input) {
             this._$input.toggleClass('with-placeholder', this._needPlaceholder && !input);
@@ -48,6 +51,13 @@
                 'click .ui-board-search-list .ui-side-bar-list-reset': $.proxy(this, '_reset'),
                 'click .ui-board-search-list .ui-side-bar-list-target': $.proxy(this, '_onclickTarget')
             });
+            $(document).on('click', $.proxy(this, '_onreset'));
+        },
+        _onreset: function (event) {
+            var target = $(event.target);
+            if (!target.closest(this.element).length) {
+                this._reset();
+            }
         },
         _onkeydown: function (event) {
             switch (event.which) {
@@ -102,13 +112,36 @@
             var val = f.trim(data.value);
             this._$input.val(val);
             if (val) {
-                this._trigger('onsearch', null, {
-                    value: val
+                var me = this;
+                this.loading(true);
+                $.jsonAjax('GET', this.options.searchUrl, {board: val}, function (orginList) {
+                    var list = me._convertBoardData(orginList);
+                    me.renderList(list);
+                    me.loading(false);
+                    me._trigger('onsearch', null, {
+                        value: val
+                    });
+                }, function (msg) {
+                    me.removeList();
+                    me.loading(false);
                 });
             }
             else {
                 this._reset();
             }
+        },
+        _convertBoardData: function (data) {
+            var targetList = [];
+            f.each(data, function (item) {
+                targetList.push({
+                    url: f.format(f.config.urlFormatter.board, {
+                            bid: encodeURIComponent(item.bid)
+                        }),
+                    fullName: item.label,
+                    name: item.board
+                });
+            });
+            return targetList;
         },
         _focus: function (index) {
             this._$list

@@ -92,12 +92,137 @@ f.namespace('f.components');
             thisValue['DataAdapter'] = new f.dataAdapter();
         },
         Tip: function (thisValue) {
-            thisValue['Tip'] = $('#global-tip');
-        }
+            thisValue['Tip'] = $('#global-tip').tip();
+        },
+        Notifications: function (thisValue) {
+            thisValue['Notifications'] = $(document.body).notifications({
+                notificationUrl: [f.config.systemConfig.ajaxUri, '/user/notifications.json'].join(""),
+                getInterval: f.config.systemConfig.notificationInterval,
+                // Check if logged in
+                ongetNotification: function () {
+                    $('.left-off-canvas-toggle i').removeClass('notified');
+                    return !!(f.config.userInfo.user && f.config.userInfo.token);
+                },
+                // Get notifications
+                ongetNotificationSuccess: function (event, data) {
+                    var notified = [],
+                        newMsg = false,
+                        list = {
+                            mail: '您有#{0}封未读信件。'
+                        };
+                    f.each(data, function (value, key) {
+                        var noti = $('.notifications').find(['.', key].join("")),
+                            icon = noti.find('.notification-icon'),
+                            label = noti.find('.notification-label'),
+                            text = label.text();
+                        // If there are new notifications
+                        if (value) {
+                            newMsg = true;
+                            // Set url when get new messages
+                            noti.addClass('notified')
+                                .attr('href', f.config.urlConfig[['new', f.capitalize(key)].join("")]);
+                            // Show number of messages
+                            label.text(value);
+                            // If more new messages
+                            if (~~text < value) {
+                                // Save notification text
+                                notified.push(f.format(list[key], value));
+                                notified.push('\n');
+                            }
+                            // Show animation
+                            icon.addClass('tada');
+                            setTimeout(function () {
+                                icon.removeClass('tada');
+                            }, 1000);
+                        }
+                        else {
+                            noti.removeClass('notified')
+                                .attr('href', f.config.urlConfig[key]);
+                            label.text(value);
+                        }
+                    });
 
-    });
+                    // Set small notification dot
+                    var smallIcon = $('.left-off-canvas-toggle i');
+                    if (newMsg) {
+                        if (smallIcon.hasClass('notified')) {
+                            smallIcon.addClass('pulse');
+                            setTimeout(function () {
+                                smallIcon.removeClass('pulse');
+                            }, 1000);
+                        }
+                        smallIcon.addClass('notified');
+                    }
+                    else {
+                        smallIcon.removeClass('notified');
+                    }
 
-    f.extend(f.components, {
+                    // Check hidden prop of window
+                    var getHiddenProp = function () {
+                        var prefixes = ['webkit','moz','ms','o'];
+
+                        // if 'hidden' is natively supported just return it
+                        if ('hidden' in document) {
+                            return 'hidden';
+                        }
+
+                        // otherwise loop over all the known prefixes until we find one
+                        for (var i = 0; i < prefixes.length; i++) {
+                            if ((prefixes[i] + 'Hidden') in document) {
+                                return prefixes[i] + 'Hidden';
+                            }
+                        }
+
+                        // otherwise it's not supported
+                        return null;
+                    };
+
+                    // Return if the window is hidden
+                    var isHidden = function () {
+                        var prop = getHiddenProp();
+                        if (!prop) {
+                            return false;
+                        }
+
+                        return document[prop];
+                    };
+
+                    // If the window is hidden and there are new notifications, display them
+                    if (isHidden() && notified.length) {
+                        if (window.webkitNotifications && window.webkitNotifications.checkPermission() == 0) {
+                            var notification = webkitNotifications.createNotification(
+                                [f.config.systemConfig.webRoot, '/images/apple-touch-icon-iphone.png'].join(""),
+                                f.config.systemConfig.defaultTitle,
+                                notified.join("")
+                            );
+                            notification.onclick = function() {
+                                this.cancel();
+                            };
+                            notification.replaceId = 'bbsNotification';
+                            notification.show();
+                        }
+                    }
+                }
+            });
+        },
+        BoardSearch: function (thisValue) {
+            f.extend(thisValue, {
+                _initBoardSearch: function (params) {
+                    var me = this;
+                    this[params.id] = $('.board-search-container').boardSearch(f.extend({
+                        searchDelay: 700,
+                        searchUrl: this.systemConfig.ajaxUri + '/boards/query.json',
+                        onsearch: function (data) {
+                            //me.Collections.hide();
+                        },
+                        onclickTarget: function (event, data) {
+                            $('.exit-canvas-menu').trigger('mousedown');
+                            data.target && (window.location.href = data.url);
+                        }
+                    }, params.options));
+                }
+            });
+        },
         Login: function (thisValue) {
             f.extend(thisValue, {
                 _initLogin: function (params) {
@@ -108,83 +233,30 @@ f.namespace('f.components');
                         registUrl: f.config.urlConfig.regist,
                         forgetUrl: f.config.urlConfig.forget,
                         cookiePath: f.config.systemConfig.cookiePath,
-                        onsubmit: function (event, data) {
-                            thisValue.ajax({
-                                name: 'login',
-                                url: 'user/login.json',
-                                type: 'POST'
-                            }, data);
+                        loginUrl: f.config.systemConfig.ajaxUri + '/user/login.json',
+                        onloginSuccess: function (event, data) {
+
+                            // Copy userInfo
+                            f.config.userInfo = f.clone(data);
+
+                            // Rerender the topbar
+                            $('.menu-nav').topbar('render');
+
+                            // Check notifications
+                            $(document.body).notifications('reset');
+
+                            // Render collections
+                            me.Collections.refresh();
+
+                            // Jump to last page
+                            if (f.config.pageInfo.params.r) {
+                                window.location.href = f.config.pageInfo.params.r;
+                            }
+                            else if (f.config.pageInfo.pageName === 'login') {
+                                window.location.href = f.config.systemConfig.defaultPage;
+                            }
                         }
                     }, params.options));
-                },
-                onlogin: function () {
-                    this.Login.login('loading');
-                },
-                onloginSuccess: function (data, ext) {
-                    // Empty and close the dialog
-                    this.Login.login('reset');
-                    this.Login.login('close');
-
-                    // Copy userInfo
-                    f.config.userInfo = f.clone(data);
-
-                    // Rerender the topbar
-                    $('.menu-nav').topbar('render');
-
-                    // Save cookies
-                    data.rm = ext.postData.rm;
-                    this.Login.login('save', data);
-
-                    // Check notifications
-                    $(document.body).notifications('reset');
-
-                    // Render collections
-                    this.Collections.collections('refresh');
-
-                    // Jump to last page
-                    if (f.config.pageInfo.params.r) {
-                        window.location.href = f.config.pageInfo.params.r;
-                    }
-                    else if (f.config.pageInfo.pageName === 'login') {
-                        window.location.href = f.config.systemConfig.defaultPage;
-                    }
-                },
-                onloginFailed: function (msg) {
-                    this.Login.login('reset');
-                    this.Login.login('error', msg);
-                }
-            });
-        },
-        BoardSearch: function (thisValue) {
-            f.extend(thisValue, {
-                _initBoardSearch: function (params) {
-                    this[params.id] = $('.board-search-container').boardSearch(f.extend({
-                        searchDelay: 700,
-                        onsearch: function (event, data) {
-                            thisValue.ajax({
-                                name: 'getBoardList',
-                                url: 'boards/query.json',
-                                adapter: 'convertBoardData'
-                            }, {
-                                board: data.value
-                            });
-                        },
-                        onclickTarget: function (event, data) {
-                            $('.exit-canvas-menu').trigger('mousedown');
-                            data.target && (window.location.href = data.url);
-                        }
-                    }, params.options));
-                },
-                ongetBoardList: function () {
-                    this.BoardSearch.boardSearch('loading', true);
-                },
-                ongetBoardListSuccess: function (data) {
-                    this.BoardSearch.boardSearch('renderList', data);
-                    this.BoardSearch.boardSearch('loading', false);
-                },
-                ongetBoardListFailed: function () {
-                    this.BoardSearch.boardSearch('removeList');
-                    this.BoardSearch.boardSearch('loading', false);
                 }
             });
         },
@@ -193,26 +265,18 @@ f.namespace('f.components');
                 _initCollections: function (params) {
                     this[params.id] = $('.collections-container').collections(f.extend({
                         collectionEditUrl: f.config.urlConfig.collectionEdit,
-                        onrefresh: function () {
-                            thisValue.ajax({
-                                name: 'getCollections',
-                                url: 'collections/list.json',
-                                adapter: 'convertCollections'
-                            });
-                        }
-                    }, params.options)).collections('refresh');
-                },
-                ongetCollections: function () {
-                    console.log(this);
-                    this.Collections.collections('loading');
-                },
-                ongetCollectionsSuccess: function (data) {
-                    this.Collections.collections('render', data);
-                },
-                ongetCollectionsFailed: function (msg) {
-                    this.Collections.collections('error', msg);
+                        collectionUrl: f.config.systemConfig.ajaxUri + '/collections/list.json'
+                    }, params.options)).collections('instance');
+                    if (f.config.userInfo.user && f.config.userInfo.token) {
+                        $('.collections-container').collections('refresh');
+                    }
                 }
             });
         }
+
+    });
+
+    f.extend(f.components, {
+
     });
 }(jQuery, f));

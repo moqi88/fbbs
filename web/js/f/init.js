@@ -12,8 +12,12 @@
          */
 
         function initBBS() {
-            // Apply fastclick
-            FastClick.attach(document.body);
+            // Init platform
+            $.each($.platform, function (key, value) {
+                if (value) {
+                    $('html').addClass(key);
+                }
+            });
 
             // Get user's cookies
             var user = {
@@ -43,120 +47,6 @@
                 menu: f.config.menuList.footerMenus,
                 icp: f.config.systemConfig.icp
             }));
-
-            // Render global tip
-            $('#global-tip').tip();
-
-            // Initialize notification
-            $(document.body).notifications({
-                notificationUrl: [f.config.systemConfig.ajaxUri, '/user/notifications.json'].join(""),
-                getInterval: f.config.systemConfig.notificationInterval,
-                // Check if logged in
-                ongetNotification: function () {
-                    $('.left-off-canvas-toggle i').removeClass('notified');
-                    return !!(f.config.userInfo.user && f.config.userInfo.token);
-                },
-                // Get notifications
-                ongetNotificationSuccess: function (event, data) {
-                    var notified = [],
-                        newMsg = false,
-                        list = {
-                            mail: '您有#{0}封未读信件。'
-                        };
-                    f.each(data, function (value, key) {
-                        var noti = $('.notifications').find(['.', key].join("")),
-                            icon = noti.find('.notification-icon'),
-                            label = noti.find('.notification-label'),
-                            text = label.text();
-                        // If there are new notifications
-                        if (value) {
-                            newMsg = true;
-                            // Set url when get new messages
-                            noti.addClass('notified')
-                                .attr('href', f.config.urlConfig[['new', f.capitalize(key)].join("")]);
-                            // Show number of messages
-                            label.text(value);
-                            // If more new messages
-                            if (~~text < value) {
-                                // Save notification text
-                                notified.push(f.format(list[key], value));
-                                notified.push('\n');
-                            }
-                            // Show animation
-                            icon.addClass('tada');
-                            setTimeout(function () {
-                                icon.removeClass('tada');
-                            }, 1000);
-                        }
-                        else {
-                            noti.removeClass('notified')
-                                .attr('href', f.config.urlConfig[key]);
-                            label.text(value);
-                        }
-                    });
-
-                    // Set small notification dot
-                    var smallIcon = $('.left-off-canvas-toggle i');
-                    if (newMsg) {
-                        if (smallIcon.hasClass('notified')) {
-                            smallIcon.addClass('pulse');
-                            setTimeout(function () {
-                                smallIcon.removeClass('pulse');
-                            }, 1000);
-                        }
-                        smallIcon.addClass('notified');
-                    }
-                    else {
-                        smallIcon.removeClass('notified');
-                    }
-
-                    // Check hidden prop of window
-                    var getHiddenProp = function () {
-                        var prefixes = ['webkit','moz','ms','o'];
-
-                        // if 'hidden' is natively supported just return it
-                        if ('hidden' in document) {
-                            return 'hidden';
-                        }
-
-                        // otherwise loop over all the known prefixes until we find one
-                        for (var i = 0; i < prefixes.length; i++) {
-                            if ((prefixes[i] + 'Hidden') in document) {
-                                return prefixes[i] + 'Hidden';
-                            }
-                        }
-
-                        // otherwise it's not supported
-                        return null;
-                    };
-
-                    // Return if the window is hidden
-                    var isHidden = function () {
-                        var prop = getHiddenProp();
-                        if (!prop) {
-                            return false;
-                        }
-
-                        return document[prop];
-                    };
-
-                    // If the window is hidden and there are new notifications, display them
-                    if (isHidden() && notified.length) {
-                        if (window.webkitNotifications && window.webkitNotifications.checkPermission() == 0) {
-                            var notification = webkitNotifications.createNotification(
-                                [f.config.systemConfig.webRoot, '/images/apple-touch-icon-iphone.png'].join(""),
-                                f.config.systemConfig.defaultTitle,
-                                notified.join("")
-                            );
-                            notification.onclick = function() {
-                                this.cancel();
-                            };
-                            notification.replaceId = 'bbsNotification';
-                            notification.show();
-                        }
-                    }
-                }
-            });
 
             // Show loading
             $(document.body).loading();
@@ -252,7 +142,7 @@
                     }
                 },
                 onfail: function () {
-                    document.title = $.isMobile.any ? f.config.systemConfig.defaultShortTitle : f.config.systemConfig.defaultTitle;
+                    document.title = f.config.systemConfig.defaultTitle;
                     $(document.body).loading('hide');
                     $('#main').html('<p class="loading-error">载入失败，请刷新重试。</p>');
                 },
@@ -261,13 +151,12 @@
                     var fullHash = data.fullHash;
                     var pageInfo = f.config.pageInfo;
                     var menuNav = $(':data(ui-topbar)');
-                    var globalTip = $('#global-tip');
+                    var globalTip = $('globalTip');
                     var body = $('#body');
                     var title = pageInfo.title || f.config.systemConfig.defaultTitle;
-                    var shortTitle = pageInfo.shortTitle || f.config.systemConfig.defaultShortTitle;
 
                     // Set title
-                    document.title = $.isMobile.any ? shortTitle : title;
+                    document.title = title;
 
                     // Hide loading
                     $(document.body).loading('hide');
@@ -303,20 +192,6 @@
                                 chrome: 'http://www.google.cn/intl/zh-CN/chrome/browser/',
                                 firefox: 'http://firefox.com.cn/download/'
                             })
-                        });
-                    }
-                    if ($.isMobile.iOS && $.browser.safari && parseInt($.browser.version) < 534) {
-                        globalTip.tip('append', {
-                            id: 'ios-alert',
-                            boxClass: 'warning',
-                            content: '您的iOS系统版本过低，无法使用本系统。'
-                        });
-                    }
-                    if ($.isMobile.Android && $.browser.webkit && parseInt($.browser.version) < 534) {
-                        globalTip.tip('append', {
-                            id: 'ios-alert',
-                            boxClass: 'warning',
-                            content: '您的浏览器版本过低，无法使用本系统。'
                         });
                     }
 

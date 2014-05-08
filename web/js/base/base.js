@@ -142,7 +142,7 @@
          */
         jsonAjax: function (type, url, jsonData, successFn, failedFn) {
             $.ajax({
-                type: type,
+                type: type || 'GET',
                 url: url,
                 data: jsonData,
                 dataType: 'json',
@@ -179,6 +179,11 @@
             BlackBerry: _isMobile.BlackBerry(),
             Windows: _isMobile.Windows(),
             any: _isMobile.Android() || _isMobile.iOS() || _isMobile.BlackBerry() || _isMobile.Windows()
+        },
+        platform: {
+            mac: (navigator.platform == "Mac68K") || (navigator.platform == "MacPPC") || (navigator.platform == "Macintosh") || (navigator.platform == "MacIntel"),
+            win: (navigator.platform == "Win32") || (navigator.platform == "Windows"),
+            linux: String(navigator.platform).indexOf("Linux") > -1
         }
 
     });

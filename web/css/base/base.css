@@ -3,8 +3,8 @@ html, body {
 
     width: 100%;
 }
-body {
-    font-family: Arial, "Microsoft YaHei", "\5b8b\4f53"!important;
+html body {
+    font-family: "Arial", "Microsoft YaHei", "微软雅黑", "WenQuanYi Micro Hei", "文泉驿微米黑", "STXihei", "华文细黑", sans-serif;
     font-weight: normal;
     font-style: normal;
     line-height: 1;
@@ -12,6 +12,12 @@ body {
     cursor: default;
 
     color: #222;
+}
+html.mac body {
+    font-family: "Arial", "STXihei", "华文细黑", "WenQuanYi Micro Hei", "文泉驿微米黑", "Microsoft YaHei", "微软雅黑", sans-serif;
+}
+html.linux body {
+    font-family: "Arial", "WenQuanYi Micro Hei", "文泉驿微米黑", "STXihei", "华文细黑", "Microsoft YaHei", "微软雅黑", sans-serif;
 }
 h1, h2, h3, h4, h5, h6 {
     font-weight: 300;

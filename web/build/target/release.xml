@@ -114,7 +114,6 @@
             <filelist dir="${base}/js/base"
                       files="underscore.js
                              underscore.string.js
-                             fastclick.js
                              base.js
                              mediator.js
                              tpl.js" />

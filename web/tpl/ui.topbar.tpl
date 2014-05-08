@@ -5,23 +5,16 @@ var pageInfo = f.config.pageInfo;
 var systemConfig = f.config.systemConfig;
 <nav class="ui-top-bar">
     <div class="wrapper">
-        <section class="left-small hide-for-desktop">
-            <a class="left-off-canvas-toggle canvas-toggle menu-icon"><span></span><i></i></a>
-        </section>
         <ul class="title-area">
             <li class="name">
                 if (menuList.title) {
                     <h1>
-                        <a class="menu-toggle hide-for-mobile" href="#{menuList.title.url}">#{menuList.title.label}</a>
-                        <a class="canvas-toggle hide-for-desktop" href="javascript:void(0);">#{menuList.title.label}</a>
+                        <a class="menu-toggle" href="#{menuList.title.url}">#{menuList.title.label}</a>
                     </h1>
                 }
             </li>
         </ul>
-        <section class="right-small hide-for-desktop">
-            <a class="right-off-canvas-toggle canvas-toggle menu-icon">收藏</a>
-        </section>
-        <section class="top-bar-section clearfix hide-for-mobile">
+        <section class="top-bar-section clearfix">
             <ul class="left">
                 f.each(menuList.menus, function (menu) {
                     <li class="nav" data-menu-nav-id="#{menu.id}"><a class="menu-toggle" href="#{menu.url}">#{menu.label}</a></li>
@@ -59,44 +52,5 @@ var systemConfig = f.config.systemConfig;
             </ul>
         </section>
     </div>
-    <aside class="right-off-canvas-menu hide-for-desktop">
-        <div class="board-search-container"></div>
-        <div class="collections-container"></div>
-    </aside>
-    <aside class="left-off-canvas-menu hide-for-desktop">
-        <ul class="off-canvas-list">
-            if ('object' === typeof userInfo && !f.isEmpty(userInfo)) {
-                <li>
-                    <a href="#{this.userInfoUrl}" title="#{userInfo.user}" class="menu-toggle">#{f.prune(userInfo.user, 10)}</a>
-                    <div class="off-canvas-notification notifications">
-                        <a href="#{this.mailUrl}" title="查看信件" class="notification mail menu-toggle"><span class="notification-icon">&nbsp;</span><span class="notification-label">0</span></a>
-                    </div>
-                </li>
-            }
-            else {
-                <li><a class="button menu-toggle menu-toggle-login" href="#{this.loginUrl}">登&emsp;陆</a></li>
-            }
-            <li><label>导航</label></li>
-            if (menuList.title) {
-                <li><a class="menu-toggle" href="#{menuList.title.url}">#{menuList.title.label}</a></li>
-            }
-            f.each(menuList.menus, function (menu) {
-                <li><a class="menu-toggle" href="#{menu.url}">#{menu.label}</a></li>
-            });
-            if ('object' === typeof userInfo && !f.isEmpty(userInfo)) {
-                <li><label>功能</label></li>
-                f.each(menuList.offCanvasMenus, function (subMenu) {
-                    <li><a href="#{subMenu.url}" class="menu-toggle">#{subMenu.label}</a></li>
-                });
-                <li><a href="#{this.logoutUrl}" class="menu-toggle logout">退出登陆</a></li>
-            }
-            <li><label>更多</label></li>
-            f.each(menuList.footerMenus, function (menu) {
-                <li><a class="menu-toggle" href="#{menu.url}" target="#{menu.target ? '_blank' : '_self'}">#{menu.label}</a></li>
-            });
-        </ul>
-    </aside>
-    <div class="left-off-canvas-menu off-canvas-footer hide-for-desktop">!#{systemConfig.copyright}</div>
-    <a class="exit-canvas-menu" href="javascript:void(0);"></a>
 </nav>
 </tpl>

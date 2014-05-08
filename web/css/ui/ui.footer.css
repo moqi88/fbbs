@@ -47,21 +47,3 @@
 .footer-nav a:hover {
     text-decoration: underline;
 }
-
-@media only screen and (max-width: 767px) {
-    .footer-content {
-        padding: 10px;
-    }
-    .footer-left {
-        padding-top: 10px;
-    }
-    .footer-left,
-    .footer-right {
-        float: none;
-    }
-    .footer-icp.hide-for-desktop {
-        display: inline;
-
-        margin-left: 10px;
-    }
-}
