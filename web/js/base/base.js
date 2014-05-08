@@ -141,7 +141,7 @@
          * @param {Function} failedFn 请求失败时触发，function(msg)
          */
         jsonAjax: function (type, url, jsonData, successFn, failedFn) {
-            $.ajax({
+            return $.ajax({
                 type: type || 'GET',
                 url: url,
                 data: jsonData,

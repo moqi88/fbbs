@@ -114,15 +114,15 @@
             if (val) {
                 var me = this;
                 this.loading(true);
-                $.jsonAjax('GET', this.options.searchUrl, {board: val}, function (orginList) {
+                this._xhr = $.jsonAjax('GET', this.options.searchUrl, {board: val}, function (orginList) {
                     var list = me._convertBoardData(orginList);
                     me.renderList(list);
-                    me.loading(false);
                     me._trigger('onsearch', null, {
                         value: val
                     });
                 }, function (msg) {
                     me.removeList();
+                }).always(function () {
                     me.loading(false);
                 });
             }
@@ -169,6 +169,9 @@
             }
         },
         _reset: function () {
+            if (this._xhr) {
+                this._xhr.abort();
+            }
             this.removeList();
             this._$input.val('');
             this._checkPlaceholder();
